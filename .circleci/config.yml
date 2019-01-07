@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/test-project-demo1
+    docker:
+      - image: circleci/node:8-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          key: test-project-demo1-{{ .Branch }}-{{ checksum "package-lock.json" }}
+      - run: npm install
+      - save_cache:
+          key: test-project-demo1-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - "node_modules"
+      - run: npm run test-ci -- --no-watch --no-progress --browsers=ChromeHeadlessCI
+      - run: npm run e2e-ci -- --protractor-config=e2e/protractor-ci.conf.js
